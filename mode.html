@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindwave Studio - Mode Selection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@1,700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background-color: #160d1f; 
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Modal popup logic */
+        .modal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: #241433;
+            border: 2px solid #b3a9ff;
+            padding: 30px;
+            border-radius: 15px;
+            width: 280px;
+            text-align: center;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-family: 'Exo', sans-serif;
+            font-style: italic;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 35px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(36, 20, 51, 0.7);
+            border: 1px solid rgba(179, 169, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            text-decoration: none;
+            color: white;
+            transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .card:hover {
+            background: rgba(179, 169, 255, 0.1);
+            border-color: #b3a9ff;
+            transform: translateY(-5px);
+        }
+
+        .mode-label {
+            font-size: 11px;
+            color: #b3a9ff; 
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* The "Plus" badge style */
+        .plus-badge {
+            font-size: 9px;
+            background: #b3a9ff;
+            color: #160d1f;
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-left: 6px;
+            font-weight: 800;
+            vertical-align: middle;
+        }
+
+        .card h2 {
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .genre-text {
+            font-size: 14px;
+            color: #b3a9ff;
+            display: block;
+            margin-bottom: 15px;
+        }
+        .card p {
+            font-size: 14px;
+            opacity: 0.8; 
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        footer {
+            margin-top: auto;
+            padding-bottom: 50px;
+            text-align: center;
+        }
+        .research-box {
+            text-decoration: none;
+            color: white;
+        }
+        .research-box span {
+            display: block;
+            font-size: 11px;
+            opacity: 0.6;
+            margin-bottom: 5px;
+        }
+        .research-box strong {
+            color: #b3a9ff;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="star-canvas"></canvas>
+
+    <div class="modal-bg" id="popup">
+        <div class="modal-content">
+            <h2 style="font-family: 'Exo'; font-style: italic; margin-top: 0;">Mindwave Plus</h2>
+            <p style="font-size: 14px; margin-bottom: 20px;">Unlock the <strong>Pomodoro Timer</strong> and more with a Plus subscription.</p>
+            <p style="font-size: 14px; margin-bottom: 20px;"> <strong>Includes:</strong> A pomodoro timer with custom settings (selection of modes and break intervals), customization of background, and <strong>structured studying/working</strong></p>
+            <button onclick="hidePopup()" style="background: #b3a9ff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; color: #160d1f;">Got it</button>
+        </div>
+    </div>
+
+    <header>
+        <h1>Mindwave Studio</h1>
+        <span class="subtitle">Select a mode</span>
+    </header>
+
+    <div class="grid-layout">
+        <a href="jazz.html" class="card">
+            <span class="mode-label">MODE 01</span>
+            <h2>Creativity</h2>
+            <span class="genre-text">Jazz</span>
+            <p>Best for brainstorming, creative writing, or idea-based work. The sound here stays light and flexible so your thoughts can move freely without feeling rushed or boxed in.</p>
+        </a>
+        <a href="lofi.html" class="card">
+            <span class="mode-label">MODE 02</span>
+            <h2>Rhythm</h2>
+            <span class="genre-text">Lo-Fi</span>
+            <p>Designed for steady, repetitive work that needs rhythm and consistency. It helps you settle into a flow and keep going without losing focus.</p>
+        </a>
+        <a href="classical+ambient.html" class="card">
+            <span class="mode-label">MODE 03</span>
+            <h2>Focus & Absorption</h2>
+            <span class="genre-text">Minimalism</span>
+            <p>Ideal for reading, studying, or learning new material. The music stays calm and structured to support understanding without pulling your attention away.</p>
+        </a>
+        <a href="immersion.html" class="card">
+            <span class="mode-label">MODE 04</span>
+            <h2>Immersion</h2>
+            <span class="genre-text">Classical & Ambient</span>
+            <p>Useful when you need to block out distractions around you. The sound takes you to another place, and helps smooth out background noise so you can focus on what’s in front of you.</p>
+        </a>
+        <a href="rapidmodulation.html" class="card">
+            <span class="mode-label">MODE 05</span>
+            <h2>Mindwave State</h2>
+            <span class="genre-text">Rapid Modulation</span>
+            <p>This mode helps you stay mentally present and engaged over time, made especially for minds that need extra stimulation and support on focusing for long and immersive sessions.</p>
+        </a>
+
+        <div class="card" onclick="showPopup()" style="cursor: pointer;">
+            <span class="mode-label">MODE 06 <span class="plus-badge">PLUS</span></span>
+            <h2>Timed Sessions</h2>
+            <span class="genre-text">Pomodoro Focus</span>
+            <p>Pomodoro timer with customizable focus and break intervals + tracks. Breaks also include silence or reduced sound, supporting recovery and sustained focus over time.</p>
+        </div>
+    </div>
+
+    <footer>
+        <a href="research.html" class="research-box">
+            <span>Want to know where these modes come from?</span>
+            <strong>Take a look at my research →</strong>
+        </a>
+    </footer>
+
+    <script>
+        function showPopup() {
+            document.getElementById('popup').style.display = 'flex';
+        }
+        function hidePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Keeping your original star opacity
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            for(let i = 0; i < 70; i++) {
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                let size = Math.random() * 1.5;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        initStars();
+        window.onresize = initStars;
+    </script>
+</body>
+</html>
