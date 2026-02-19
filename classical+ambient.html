@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mindwave Studio - Mode 3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #160d1f; 
+            --accent-periwinkle: #b3a9ff;
+            --accent-glow: rgba(179, 169, 255, 0.2);
+            --card-bg: rgba(36, 20, 51, 0.7);
+            --text: #ffffff;
+            --sidebar-active: rgba(179, 169, 255, 0.15);
+            --sidebar-border: rgba(179, 169, 255, 0.4);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        #star-canvas { position: fixed; top: 0; left: 0; z-index: 0; pointer-events: none; }
+
+        .app-container {
+            position: relative; z-index: 1;
+            display: flex; height: 100vh; width: 100vw;
+        }
+
+        .sidebar {
+            width: 30%; padding: 50px;
+            background: rgba(22, 13, 31, 0.6);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(179, 169, 255, 0.1);
+            display: flex; flex-direction: column; 
+            justify-content: space-between;
+            z-index: 2;
+        }
+
+        .info-card h1 { margin: 0; font-size: 2.2rem; font-weight: 600; letter-spacing: -1px; }
+        .info-card p { opacity: 0.6; line-height: 1.6; font-weight: 300; margin-top: 10px; }
+
+        .playlist-container {
+            display: flex; flex-direction: column;
+            gap: 20px; margin-top: 40px;
+        }
+
+        .song-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 18px 25px; border-radius: 12px;
+            cursor: pointer; transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            opacity: 0.4;
+            font-weight: 400;
+        }
+
+        .song-item.active {
+            background: var(--sidebar-active);
+            border-color: var(--sidebar-border);
+            opacity: 1;
+        }
+
+        .song-item:hover:not(.active) {
+            opacity: 0.7;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .research-box {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .research-link {
+            text-decoration: none;
+            display: block;
+        }
+
+        .research-btn {
+            background: none; border: none;
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            text-align: left; cursor: pointer;
+            transition: 0.3s; padding: 0;
+            width: 100%;
+        }
+
+        .research-btn span { display: block; font-size: 11px; opacity: 0.6; margin-bottom: 5px; }
+        .research-btn strong { display: block; font-size: 14px; color: var(--accent-periwinkle); text-decoration: underline; text-underline-offset: 4px; }
+
+        .visualizer-area {
+            flex: 1; position: relative;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-end;
+            padding-bottom: 60px;
+        }
+
+        canvas#visualizer {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            filter: drop-shadow(0 0 15px var(--accent-glow));
+            pointer-events: none;
+        }
+
+        .seeker-container { width: 45%; margin-bottom: 25px; display: flex; align-items: center; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 2px; background: rgba(179, 169, 255, 0.2); border-radius: 3px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 10px; width: 10px; border-radius: 50%; background: var(--accent-periwinkle); margin-top: -4px; }
+
+        .player-controls { display: flex; gap: 40px; align-items: center; z-index: 2; }
+        .btn-icon { background: none; border: none; cursor: pointer; fill: white; opacity: 0.3; transition: 0.3s; display: flex; }
+        .btn-icon:hover { opacity: 0.9; }
+        
+        .play-btn { 
+            background: var(--accent-periwinkle);
+            border-radius: 50%; width: 64px; height: 64px; 
+            display: flex; align-items: center; justify-content: center;
+            border: none;
+            cursor: pointer; fill: var(--bg-deep); transition: 0.3s;
+        }
+        .play-btn:hover { transform: scale(1.05); }
+
+        audio { display: none; }
+    </style>
+</head>
+<body>
+
+    <canvas id="star-canvas"></canvas>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div>
+                <div class="info-card">
+                    <h1>Mode 3: Focus & Absorption</h1>
+                    <p style="margin-top: 15px; font-size: 18px; color: var(--accent-periwinkle); opacity: 0.8; font-weight: 400;">
+                        Classical and Ambient Music 
+                    <p>This mode is designed for deep, sustained focus where understanding and immersion are the priority. The sound is calm, spacious, and unobtrusive, helping users stay mentally engaged with the task without drawing attention to the music itself. It works best for reading, studying, learning new concepts, or any activity that requires absorbing information while reducing external distractions and maintaining mental clarity.</p>
+                </div>
+                
+                <div class="playlist-container" id="playlist">
+                    <div class="song-item active" data-index="0"><span>01. Between The Lines</span></div>
+                    <div class="song-item" data-index="1"><span>02. Haze Field</span></div>
+                </div>
+            </div>
+
+            <div class="research-box">
+                <a href="research.html" class="research-link">
+                    <div class="research-btn">
+                        <span>Want to know what you are hearing?</span>
+                        <strong>Take a look at my research →</strong>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <main class="visualizer-area">
+            <canvas id="visualizer"></canvas>
+
+            <div class="seeker-container">
+                <input type="range" id="seeker" value="0" min="0" step="0.1">
+            </div>
+
+            <div class="player-controls">
+                <button class="btn-icon" id="prevBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button class="play-btn" id="playBtn">
+                    <svg id="playIcon" width="28" height="28" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button class="btn-icon" id="nextBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <audio id="audio"></audio>
+
+    <script>
+        const playlist = [{ src: "Classical Track.mp3" }, { src: "Ambient Track 1.mp3" }];
+        let currentTrackIndex = 0;
+
+        const starCanvas = document.getElementById('star-canvas');
+        const sCtx = starCanvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            starCanvas.width = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+            // Static stars logic
+            stars = Array.from({ length: 150 }, () => ({
+                x: Math.random() * starCanvas.width,
+                y: Math.random() * starCanvas.height,
+                size: Math.random() * 1.2
+            }));
+            
+            sCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+            sCtx.fillStyle = "rgba(255, 255, 255, 5)";
+            stars.forEach(s => {
+                sCtx.beginPath();
+                sCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                sCtx.fill();
+            });
+        }
+
+        const audio = document.getElementById("audio");
+        const canvas = document.getElementById("visualizer");
+        const seeker = document.getElementById("seeker");
+        const ctx = canvas.getContext("2d");
+        let audioCtx, analyser, dataArray, source;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 512;
+                analyser.smoothingTimeConstant = 0.9;
+                source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            }
+        }
+
+        function loadTrack(index) {
+            currentTrackIndex = index;
+            audio.src = playlist[index].src;
+            if (index === 0) { 
+                audio.volume = 0.2; // Lower volume for "Between The Lines"
+            } else {
+                audio.volume = 1.0; // Default volume for other tracks
+            }
+            document.querySelectorAll('.song-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+        }
+
+        function draw() {
+            requestAnimationFrame(draw);
+            if (!analyser) return;
+            analyser.getByteFrequencyData(dataArray);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const width = canvas.width;
+            const height = canvas.height;
+            const sliceWidth = width / (dataArray.length / 2.5);
+            
+            ctx.lineWidth = 5; // Slightly thicker to show off the colors
+            ctx.lineCap = 'round';
+
+            // BRINGING BACK THE COLOR: Pink -> Purple -> Periwinkle -> Blue
+            let grad = ctx.createLinearGradient(0, 0, width, 0);
+            grad.addColorStop(0, "#ff7eb9");   // Soft Pink
+            grad.addColorStop(0.3, "#705df2"); // Original Purple
+            grad.addColorStop(0.6, "#b3a9ff"); // Your Periwinkle
+            grad.addColorStop(1, "#a29bfe");   // Soft Blue
+            
+            ctx.strokeStyle = grad;
+            
+            // Subtle neon glow that matches the colors
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "rgba(112, 93, 242, 0.4)";
+
+            [1, -1].forEach(dir => {
+                ctx.beginPath();
+                let x = 0;
+                for (let i = 0; i < dataArray.length / 2; i++) {
+                    let v = dataArray[i] / 128.0;
+                    let y = (v * height / 8) * dir;
+                    if (i === 0) ctx.moveTo(x, height / 2 - y);
+                    else ctx.lineTo(x, height / 2 - y);
+                    x += sliceWidth;
+                }
+                ctx.stroke();
+            });
+        }
+
+
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const playPath = "M8 5v14l11-7z";
+        const pausePath = "M6 19h4V5H6v14zm8-14v14h4V5h-4z";
+
+        playBtn.addEventListener('click', () => {
+            initAudioContext();
+            if (audio.paused) {
+                audio.play();
+                playIcon.querySelector('path').setAttribute('d', pausePath);
+                draw();
+            } else {
+                audio.pause();
+                playIcon.querySelector('path').setAttribute('d', playPath);
+            }
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            if (!isNaN(audio.duration)) {
+                seeker.max = audio.duration;
+                seeker.value = audio.currentTime;
+            }
+        });
+
+        seeker.addEventListener('input', () => { audio.currentTime = seeker.value; });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+            loadTrack(currentTrackIndex);
+            audio.play();
+            playIcon.querySelector('path').setAttribute('d', pausePath);
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (audio.currentTime > 2) audio.currentTime = 0;
+            else {
+                currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+                loadTrack(currentTrackIndex);
+            }
+            audio.play();
+            playIcon.querySelector('path').setAttribute('d', pausePath);
+        });
+
+        document.querySelectorAll('.song-item').forEach(item => {
+            item.addEventListener('click', () => {
+                loadTrack(parseInt(item.getAttribute('data-index')));
+                initAudioContext();
+                audio.play();
+                playIcon.querySelector('path').setAttribute('d', pausePath);
+                draw();
+            });
+        });
+
+        // Auto-play next track when the current one ends
+        audio.addEventListener('ended', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+            loadTrack(currentTrackIndex);
+            audio.play();
+            // Keep the icon as 'pause' because music is still playing
+            playIcon.querySelector('path').setAttribute('d', pausePath);
+        });
+
+        function resizeCanvas() {
+            initStars();
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        loadTrack(0);
+        resizeCanvas();
+    </script>
+</body>
+</html>
